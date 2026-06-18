@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Calories">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1D9E75">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<title>Calories</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --bg2: #f5f5f4;
+  --bg3: #eeecea;
+  --text: #1a1a18;
+  --text2: #6b6b68;
+  --text3: #9e9e9a;
+  --border: rgba(0,0,0,0.11);
+  --border2: rgba(0,0,0,0.20);
+  --green: #1D9E75;
+  --red: #E24B4A;
+  --blue: #185FA5;
+  --radius: 10px;
+  --radius-lg: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1c1a;
+    --bg2: #272725;
+    --bg3: #313130;
+    --text: #f0eeea;
+    --text2: #a8a8a4;
+    --text3: #6b6b68;
+    --border: rgba(255,255,255,0.09);
+    --border2: rgba(255,255,255,0.18);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg3);
+  color: var(--text);
+  overflow-y: auto;
+}
+.app {
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 0 14px 48px;
+  padding-top: calc(env(safe-area-inset-top) + 16px);
+}
+
+/* Header */
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+.header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+.date-lbl { font-size: 12px; color: var(--text2); text-transform: capitalize; }
+
+/* Ring */
+.ring-section { display: flex; justify-content: center; margin-bottom: 20px; }
+.ring-rel { position: relative; width: 164px; height: 164px; }
+.ring-rel svg { transform: rotate(-90deg); }
+.ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; width: 116px; }
+.ring-num { font-size: 32px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
+.ring-sub { font-size: 11px; color: var(--text2); margin-top: 4px; }
+.ring-goal-lbl { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat { background: var(--bg); border-radius: var(--radius); padding: 12px 14px; }
+.stat .lbl { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+.stat .val { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+.val-ok { color: var(--green); }
+.val-over { color: var(--red); }
+
+/* Cards */
+.card { background: var(--bg); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; }
+.card-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+
+/* Inputs */
+input[type=text], input[type=number], input[type=password] {
+  font-size: 15px; padding: 10px 13px;
+  border: 1px solid var(--border2); border-radius: var(--radius);
+  background: var(--bg2); color: var(--text);
+  outline: none; height: 44px; font-family: inherit;
+  transition: border-color .15s; width: 100%;
+}
+input:focus { border-color: var(--blue); }
+input[type=password] { font-family: monospace; letter-spacing: 2px; }
+
+/* Buttons */
+.btn {
+  height: 44px; padding: 0 18px; border-radius: var(--radius);
+  border: 1px solid var(--border2); background: var(--bg2); color: var(--text);
+  font-size: 15px; font-family: inherit; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  white-space: nowrap; transition: background .12s;
+}
+.btn:active { transform: scale(0.97); opacity: 0.85; }
+.btn-primary { background: var(--text); color: var(--bg); border-color: transparent; }
+.btn-sm { height: 36px; padding: 0 13px; font-size: 13px; }
+.btn-icon { width: 44px; padding: 0; flex-shrink: 0; }
+.btn-icon-sm { width: 36px; height: 36px; padding: 0; flex-shrink: 0; }
+
+/* Search */
+.search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.search-row input { flex: 1; }
+.results-list { margin-top: 2px; }
+.result-item {
+  display: flex; align-items: center;
+  padding: 11px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 7px;
+  cursor: pointer; background: var(--bg2); transition: background .1s;
+}
+.result-item:active { background: var(--bg3); }
+.result-info { flex: 1; min-width: 0; }
+.result-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.result-right { display: flex; align-items: center; gap: 6px; margin-left: 10px; flex-shrink: 0; }
+.result-cal { font-size: 15px; font-weight: 700; }
+.result-unit { font-size: 11px; color: var(--text3); }
+
+.badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
+.badge-off  { background: #E1F5EE; color: #0F6E56; }
+.badge-gem  { background: #E6F1FB; color: #185FA5; }
+.badge-man  { background: #F1EFE8; color: #5F5E5A; }
+@media (prefers-color-scheme: dark) {
+  .badge-off { background: #085041; color: #9FE1CB; }
+  .badge-gem { background: #0C447C; color: #B5D4F4; }
+  .badge-man { background: #444441; color: #D3D1C7; }
+}
+
+.status-msg { font-size: 13px; color: var(--text2); padding: 12px 0; text-align: center; }
+.status-err { color: var(--red); }
+.divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+/* Manual row */
+.manual-row { display: flex; gap: 8px; align-items: center; }
+.manual-row input[type=text] { flex: 1; }
+.manual-row input[type=number] { width: 88px; flex-shrink: 0; }
+
+/* Entries */
+.entries-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.entries-header span { font-size: 15px; font-weight: 600; }
+.btn-link { background: none; border: none; font-size: 12px; color: var(--text3); cursor: pointer; padding: 0; font-family: inherit; }
+.btn-link:hover { color: var(--red); }
+.entry { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.entry:last-child { border-bottom: none; }
+.entry-left { flex: 1; min-width: 0; }
+.entry-name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.entry-sub { margin-top: 3px; }
+.entry-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: 10px; }
+.entry-cal { font-size: 15px; font-weight: 700; }
+.btn-del { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 20px; padding: 2px; display: flex; align-items: center; }
+.btn-del:active { color: var(--red); }
+.empty { padding: 20px; text-align: center; color: var(--text3); font-size: 13px; }
+
+/* Settings */
+.settings-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.settings-hint { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.55; }
+.goal-row { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
+.goal-row input { width: 100px; flex-shrink: 0; }
+.goal-row span { font-size: 13px; color: var(--text2); flex: 1; }
+.key-row { display: flex; gap: 8px; }
+.key-row input { flex: 1; }
+.key-status { font-size: 12px; color: var(--text3); margin-top: 8px; line-height: 1.5; }
+.key-status a { color: var(--blue); text-decoration: none; }
+
+/* Install banner (si pas encore installé) */
+.install-banner {
+  display: none; background: #E1F5EE; border-radius: var(--radius);
+  padding: 10px 14px; margin-bottom: 14px;
+  font-size: 13px; color: #0F6E56;
+  align-items: center; gap: 10px;
+}
+.install-banner i { font-size: 18px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <h1>Calories du jour</h1>
+    <span class="date-lbl" id="date-lbl"></span>
+  </div>
+
+  <div class="install-banner" id="install-banner">
+    <i class="ti ti-download"></i>
+    <span id="install-text">Installe l'appli sur ton écran d'accueil !</span>
+    <button class="btn btn-sm" id="install-btn" style="margin-left:auto">Installer</button>
+  </div>
+
+  <div class="ring-section">
+    <div class="ring-rel">
+      <svg width="164" height="164" viewBox="0 0 164 164">
+        <circle cx="82" cy="82" r="68" fill="none" stroke="var(--bg2)" stroke-width="14"/>
+        <circle cx="82" cy="82" r="68" fill="none" stroke="#1D9E75" stroke-width="14"
+          stroke-linecap="round" stroke-dasharray="427.26" stroke-dashoffset="427.26" id="ring"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-num" id="r-num">0</div>
+        <div class="ring-sub">kcal consommées</div>
+        <div class="ring-goal-lbl" id="r-goal">/ 2000 kcal</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="lbl">Objectif</div>
+      <div class="val" id="s-goal">2000</div>
+    </div>
+    <div class="stat">
+      <div class="lbl">Restant</div>
+      <div class="val val-ok" id="s-rem">2000</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Rechercher un aliment</div>
+    <div class="search-row">
+      <input type="text" id="q" placeholder="Yaourt, poulet grillé, pizza…" autocomplete="off" />
+      <button class="btn btn-primary btn-icon" onclick="doSearch()" aria-label="Rechercher">
+        <i class="ti ti-search"></i>
+      </button>
+    </div>
+    <div class="results-list" id="search-results"></div>
+    <div class="divider"></div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Ou ajouter manuellement</div>
+    <div class="manual-row">
+      <input type="text" id="m-name" placeholder="Nom de l'aliment" autocomplete="off" />
+      <input type="number" id="m-cal" placeholder="kcal" min="1" />
+      <button class="btn btn-icon-sm btn-sm" onclick="addManual()" aria-label="Ajouter">
+        <i class="ti ti-plus"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="entries-header">
+      <span>Repas du jour</span>
+      <button class="btn-link" onclick="resetDay()">Tout effacer</button>
+    </div>
+    <div id="entries-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Réglages</div>
+
+    <div class="settings-label">Objectif journalier</div>
+    <div class="goal-row">
+      <input type="number" id="goal-inp" min="100" step="50" />
+      <span>kcal / jour</span>
+      <button class="btn btn-sm" onclick="saveGoal()">Enregistrer</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="settings-label" style="margin-top:4px">Clé API Gemini</div>
+    <div class="settings-hint">
+      Utilisée si Open Food Facts ne trouve pas l'aliment. Stockée uniquement sur cet appareil.
+    </div>
+    <div class="key-row">
+      <input type="password" id="gem-key" placeholder="AIza…" autocomplete="off" />
+      <button class="btn btn-sm" onclick="saveKey()">
+        <i class="ti ti-check"></i> Sauver
+      </button>
+    </div>
+    <div class="key-status" id="key-status">
+      Aucune clé · <a href="https://aistudio.google.com/apikey" target="_blank">Obtenir une clé gratuite →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CIRC = 2 * Math.PI * 68;
+let state = { goal: 2000, entries: [], gemKey: '' };
+let deferredPrompt = null;
+
+function todayKey() { return new Date().toISOString().slice(0, 10); }
+
+function load() {
+  try {
+    const s = localStorage.getItem('calTracker');
+    if (s) {
+      const p = JSON.parse(s);
+      state.goal   = p.goal   || 2000;
+      state.gemKey = p.gemKey || '';
+      state.entries = (p.days && p.days[todayKey()]) || [];
+    }
+  } catch(e) {}
+}
+
+function save() {
+  try {
+    const s = localStorage.getItem('calTracker');
+    const p = s ? JSON.parse(s) : {};
+    p.goal   = state.goal;
+    p.gemKey = state.gemKey;
+    if (!p.days) p.days = {};
+    p.days[todayKey()] = state.entries;
+    localStorage.setItem('calTracker', JSON.stringify(p));
+  } catch(e) {}
+}
+
+function render() {
+  const total = state.entries.reduce((s, e) => s + e.cal, 0);
+  const rem = state.goal - total;
+  const pct = Math.min(total / state.goal, 1);
+
+  document.getElementById('r-num').textContent = total;
+  document.getElementById('r-goal').textContent = '/ ' + state.goal + ' kcal';
+  document.getElementById('s-goal').textContent = state.goal;
+  document.getElementById('goal-inp').value = state.goal;
+
+  const remEl = document.getElementById('s-rem');
+  remEl.textContent = rem < 0 ? '+' + Math.abs(rem) : rem;
+  remEl.className = 'val ' + (rem < 0 ? 'val-over' : 'val-ok');
+
+  const ring = document.getElementById('ring');
+  ring.style.strokeDashoffset = CIRC * (1 - pct);
+  ring.style.stroke = rem < 0 ? '#E24B4A' : '#1D9E75';
+
+  const keyEl = document.getElementById('key-status');
+  if (state.gemKey) {
+    keyEl.innerHTML = '<span style="color:var(--green)">✓ Clé Gemini enregistrée</span>';
+    document.getElementById('gem-key').value = '••••••••';
+  } else {
+    keyEl.innerHTML = 'Aucune clé · <a href="https://aistudio.google.com/apikey" target="_blank">Obtenir une clé gratuite →</a>';
+  }
+
+  const list = document.getElementById('entries-list');
+  if (!state.entries.length) {
+    list.innerHTML = '<div class="empty">Aucun aliment ajouté aujourd\'hui</div>';
+  } else {
+    list.innerHTML = state.entries.map((e, i) => {
+      const bc = e.src === 'off' ? 'badge-off' : e.src === 'gemini' ? 'badge-gem' : 'badge-man';
+      const bt = e.src === 'off' ? 'OFF' : e.src === 'gemini' ? 'Gemini' : 'Manuel';
+      return `<div class="entry">
+        <div class="entry-left">
+          <div class="entry-name">${e.name}</div>
+          <div class="entry-sub"><span class="badge ${bc}">${bt}</span></div>
+        </div>
+        <div class="entry-right">
+          <span class="entry-cal">${e.cal} kcal</span>
+          <button class="btn-del" onclick="delEntry(${i})" aria-label="Supprimer"><i class="ti ti-x"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  const d = new Date();
+  document.getElementById('date-lbl').textContent =
+    d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+function delEntry(i)  { state.entries.splice(i, 1); save(); render(); }
+function resetDay()   { if (!confirm('Effacer tous les aliments du jour ?')) return; state.entries = []; save(); render(); }
+function saveGoal()   { const v = parseInt(document.getElementById('goal-inp').value); if (v >= 100) { state.goal = v; save(); render(); } }
+function saveKey() {
+  const k = document.getElementById('gem-key').value.trim();
+  if (!k || k === '••••••••') return;
+  state.gemKey = k; save(); render();
+}
+
+function addEntry(name, cal, src) {
+  state.entries.push({ name, cal: Math.round(cal), src });
+  save(); render();
+  document.getElementById('search-results').innerHTML = '';
+  document.getElementById('q').value = '';
+}
+
+function addManual() {
+  const name = document.getElementById('m-name').value.trim();
+  const cal  = parseInt(document.getElementById('m-cal').value);
+  if (!name || !cal || cal <= 0) return;
+  addEntry(name, cal, 'manual');
+  document.getElementById('m-name').value = '';
+  document.getElementById('m-cal').value  = '';
+}
+
+function setStatus(msg, isErr) {
+  document.getElementById('search-results').innerHTML =
+    `<div class="status-msg ${isErr ? 'status-err' : ''}">${msg}</div>`;
+}
+
+async function searchOFF(query) {
+  const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&lc=fr&fields=product_name,brands,nutriments&page_size=5`;
+  const r = await fetch(url);
+  const d = await r.json();
+  return (d.products || []).filter(p => p.product_name && p.nutriments && p.nutriments['energy-kcal_100g']);
+}
+
+async function askGemini(query) {
+  const prompt = `Donne une estimation calorique réaliste pour l'aliment suivant : "${query}". Réponds UNIQUEMENT avec du JSON valide sans markdown ni backticks : {"name":"nom de l'aliment en français","kcal_per_100g":nombre,"serving_g":nombre,"serving_label":"description de la portion typique"}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${state.gemKey}`;
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message);
+  const text = (d.candidates?.[0]?.content?.parts?.[0]?.text || '').replace(/```json|```/g, '').trim();
+  return JSON.parse(text);
+}
+
+function renderResults(offProducts, gemData) {
+  let html = '';
+  offProducts.forEach(p => {
+    const kcal = Math.round(p.nutriments['energy-kcal_100g']);
+    const name = p.product_name + (p.brands ? ' · ' + p.brands.split(',')[0].trim() : '');
+    const safe = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    html += `<div class="result-item" onclick="addEntry('${safe}',${kcal},'off')">
+      <div class="result-info">
+        <div class="result-name">${name}</div>
+        <div class="result-meta">pour 100 g</div>
+      </div>
+      <div class="result-right">
+        <span class="result-cal">${kcal}</span>
+        <span class="result-unit">kcal</span>
+        <span class="badge badge-off">OFF</span>
+      </div>
+    </div>`;
+  });
+  if (gemData) {
+    const kcal = Math.round(gemData.kcal_per_100g * gemData.serving_g / 100);
+    const safe = gemData.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    html += `<div class="result-item" onclick="addEntry('${safe}',${kcal},'gemini')">
+      <div class="result-info">
+        <div class="result-name">${gemData.name}</div>
+        <div class="result-meta">${gemData.serving_label || gemData.serving_g + ' g'} · estimation</div>
+      </div>
+      <div class="result-right">
+        <span class="result-cal">${kcal}</span>
+        <span class="result-unit">kcal</span>
+        <span class="badge badge-gem">Gemini</span>
+      </div>
+    </div>`;
+  }
+  if (!html) html = '<div class="status-msg">Aucun résultat — essaie un autre terme ou ajoute manuellement.</div>';
+  document.getElementById('search-results').innerHTML = html;
+}
+
+async function doSearch() {
+  const q = document.getElementById('q').value.trim();
+  if (!q) return;
+  setStatus('Recherche dans Open Food Facts…');
+  try {
+    const offRes = await searchOFF(q);
+    if (offRes.length > 0) { renderResults(offRes, null); return; }
+    if (!state.gemKey) {
+      setStatus('Aucun résultat · Ajoute ta clé Gemini dans Réglages pour les aliments génériques.');
+      return;
+    }
+    setStatus('Non trouvé dans OFF — estimation via Gemini…');
+    try {
+      const gem = await askGemini(q);
+      renderResults([], gem);
+    } catch(e) { setStatus('Erreur Gemini : ' + e.message, true); }
+  } catch(e) { setStatus('Erreur réseau : ' + e.message, true); }
+}
+
+// PWA install prompt
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const banner = document.getElementById('install-banner');
+  banner.style.display = 'flex';
+  document.getElementById('install-btn').addEventListener('click', async () => {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') banner.style.display = 'none';
+    deferredPrompt = null;
+  });
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').style.display = 'none';
+});
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
+// Keyboard shortcuts
+document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+document.getElementById('m-name').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('m-cal').focus(); });
+document.getElementById('m-cal').addEventListener('keydown', e => { if (e.key === 'Enter') addManual(); });
+
+load();
+render();
+</script>
+</body>
+</html>
