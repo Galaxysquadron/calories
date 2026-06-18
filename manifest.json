@@ -2,20 +2,21 @@
   "name": "Calories du jour",
   "short_name": "Calories",
   "description": "Tracker de calories journalier avec Open Food Facts et Gemini",
-  "start_url": "/",
+  "start_url": "/calories/",
+  "scope": "/calories/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#1D9E75",
   "theme_color": "#1D9E75",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/calories/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "/calories/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
